@@ -1,0 +1,738 @@
+Exercice 0 : creation des tableaux 
+
+
+CREATE TABLE Streamer (
+    id_streamer SERIAL PRIMARY KEY,
+    pseudo VARCHAR(100) UNIQUE NOT NULL,
+    url_twitch VARCHAR(255)
+);
+
+CREATE TABLE Creneau (
+    id_creneau SERIAL PRIMARY KEY,
+    id_streamer INT NOT NULL,
+    date_debut_autorisee TIMESTAMP NOT NULL,
+    date_fin_autorisee TIMESTAMP NOT NULL,
+    FOREIGN KEY (id_streamer) REFERENCES Streamer(id_streamer)
+);
+
+CREATE TABLE Stream (
+    id_stream SERIAL PRIMARY KEY,
+    id_streamer INT NOT NULL,
+    id_creneau INT NOT NULL,
+    titre VARCHAR(255) NOT NULL,
+    heure_debut TIMESTAMP NOT NULL,
+    heure_fin TIMESTAMP NOT NULL,
+    date_fin_effective TIMESTAMP,
+    FOREIGN KEY (id_streamer) REFERENCES Streamer(id_streamer),
+    FOREIGN KEY (id_creneau) REFERENCES Creneau(id_creneau)
+);
+
+CREATE TABLE Defi (
+    id_defi SERIAL PRIMARY KEY,
+    intitule VARCHAR(255) NOT NULL,
+    montant_palier DECIMAL(12,2) NOT NULL,
+    etat_validation BOOLEAN NOT NULL
+);
+
+CREATE TABLE Participation_Defi (
+    id_streamer INT,
+    id_defi INT,
+    PRIMARY KEY (id_streamer, id_defi),
+    FOREIGN KEY (id_streamer) REFERENCES Streamer(id_streamer),
+    FOREIGN KEY (id_defi) REFERENCES Defi(id_defi)
+);
+
+
+
+
+
+PHASE 1
+
+Exercice 1 : Population de la base de données
+
+
+
+INSERT INTO Streamer (pseudo, url_twitch) VALUES
+('xQc', 'https://www.twitch.tv/xqc'),
+('KaiCenat', 'https://www.twitch.tv/kaicenat'),
+('Pokimane', 'https://www.twitch.tv/pokimane'),
+('Ninja', 'https://www.twitch.tv/ninja'),
+('HasanAbi', 'https://www.twitch.tv/hasanabi'),
+('Asmongold', 'https://www.twitch.tv/asmongold'),
+('Shroud', 'https://www.twitch.tv/shroud'),
+('Ludwig', 'https://www.twitch.tv/ludwig'),
+('ExtraEmily', 'https://www.twitch.tv/extraemily'),
+('IShowSpeed', 'https://www.twitch.tv/ishowspeed');
+
+
+
+INSERT INTO Creneau (id_streamer, date_debut_autorisee, date_fin_autorisee) VALUES
+(1, '2026-05-22 18:00:00', '2026-05-22 23:00:00'),
+(1, '2026-05-24 14:00:00', '2026-05-24 20:00:00'),
+
+(2, '2026-05-22 20:00:00', '2026-05-23 01:00:00'),
+(2, '2026-05-25 15:00:00', '2026-05-25 19:00:00'),
+
+(3, '2026-05-21 17:00:00', '2026-05-21 22:00:00'),
+(3, '2026-05-23 12:00:00', '2026-05-23 18:00:00'),
+
+(4, '2026-05-22 16:00:00', '2026-05-22 21:00:00'),
+(4, '2026-05-24 10:00:00', '2026-05-24 15:00:00'),
+
+(5, '2026-05-21 19:00:00', '2026-05-22 00:00:00'),
+(5, '2026-05-23 14:00:00', '2026-05-23 20:00:00'),
+
+(6, '2026-05-22 18:30:00', '2026-05-22 23:30:00'),
+(6, '2026-05-25 13:00:00', '2026-05-25 18:00:00'),
+
+(7, '2026-05-21 15:00:00', '2026-05-21 20:00:00'),
+(7, '2026-05-24 16:00:00', '2026-05-24 22:00:00'),
+
+(8, '2026-05-22 21:00:00', '2026-05-23 02:00:00'),
+(8, '2026-05-24 13:00:00', '2026-05-24 18:00:00'),
+
+(9, '2026-05-21 18:00:00', '2026-05-21 23:00:00'),
+(9, '2026-05-23 11:00:00', '2026-05-23 16:00:00'),
+
+(10, '2026-05-22 17:00:00', '2026-05-22 22:00:00'),
+(10, '2026-05-25 14:00:00', '2026-05-25 19:00:00');
+
+
+INSERT INTO Defi (intitule, montant_palier, etat_validation) VALUES
+('Teinture de cheveux en bleu', 500.00, FALSE),
+('Stream de 24 heures', 1000.00, FALSE),
+('Jouer a un jeu d horreur', 2500.00, FALSE),
+('Deguisement ridicule pendant 1 stream', 5000.00, FALSE),
+('Chanter en live', 7500.00, FALSE),
+('Tournoi communautaire', 10000.00, FALSE),
+('Marathon gaming de 48 heures', 25000.00, FALSE),
+('IRL dans une ville choisie par le chat', 50000.00, FALSE),
+('Tatouage choisi par la communaute', 75000.00, FALSE),
+('Saut en parachute en live', 100000.00, FALSE);
+
+
+INSERT INTO Participation_Defi (id_streamer, id_defi) VALUES
+(1, 1),
+(1, 4),
+(1, 10),
+
+(2, 2),
+(2, 5),
+
+(3, 3),
+(3, 7),
+
+(4, 1),
+(4, 6),
+
+(5, 8),
+(5, 10),
+
+(6, 2),
+(6, 9),
+
+(7, 4),
+(7, 7),
+
+(8, 3),
+(8, 10),
+
+(9, 5),
+(9, 8),
+
+(10, 6),
+(10, 9);
+
+
+INSERT INTO Stream (
+    id_streamer,
+    id_creneau,
+    titre,
+    heure_debut,
+    heure_fin,
+    date_fin_effective
+) VALUES
+(1, 1, 'Ranked Gameplay Night',
+'2026-05-22 18:30:00',
+'2026-05-22 22:30:00',
+'2026-05-22 22:25:00'),
+
+(1, 2, 'Community Games',
+'2026-05-24 15:00:00',
+'2026-05-24 19:00:00',
+NULL),
+
+(2, 3, 'Late Night Just Chatting',
+'2026-05-22 20:30:00',
+'2026-05-23 00:30:00',
+'2026-05-23 00:10:00'),
+
+(2, 4, 'React Stream',
+'2026-05-25 15:30:00',
+'2026-05-25 18:30:00',
+NULL),
+
+(3, 5, 'MMO Adventure',
+'2026-05-21 18:00:00',
+'2026-05-21 21:30:00',
+'2026-05-21 21:20:00'),
+
+(3, 6, 'Weekend Tournament',
+'2026-05-23 13:00:00',
+'2026-05-23 17:00:00',
+NULL),
+
+(4, 7, 'Variety Stream',
+'2026-05-22 17:00:00',
+'2026-05-22 20:00:00',
+'2026-05-22 19:50:00'),
+
+(5, 9, 'FPS Ranked Grind',
+'2026-05-21 20:00:00',
+'2026-05-21 23:30:00',
+NULL),
+
+(6, 11, 'Challenge Run',
+'2026-05-22 19:00:00',
+'2026-05-22 23:00:00',
+'2026-05-22 22:45:00'),
+
+(7, 13, 'Competitive Matches',
+'2026-05-21 16:00:00',
+'2026-05-21 19:30:00',
+NULL),
+
+(8, 15, 'Night Gaming Session',
+'2026-05-22 21:30:00',
+'2026-05-23 01:30:00',
+'2026-05-23 01:15:00'),
+
+(8, 16, 'Weekend Chill Stream',
+'2026-05-24 14:00:00',
+'2026-05-24 17:30:00',
+NULL),
+
+(9, 17, 'Story Game Marathon',
+'2026-05-21 18:30:00',
+'2026-05-21 22:00:00',
+'2026-05-21 21:55:00'),
+
+(10, 19, 'Speedrun Practice',
+'2026-05-22 17:30:00',
+'2026-05-22 21:00:00',
+NULL),
+
+(10, 20, 'Community Event',
+'2026-05-25 15:00:00',
+'2026-05-25 18:30:00',
+'2026-05-25 18:20:00');
+
+Exercice 2 :   Requêtes SELECT simples et filtrées
+
+
+SELECT s.id_streamer, s.pseudo, s.url_twitch
+FROM Streamer s;
+
+
+
+SELECT *
+FROM Creneau
+WHERE DATE(date_debut_autorisee) = '2025-09-06'
+   OR DATE(date_fin_autorisee) = '2025-09-06';
+
+
+SELECT d.montant_palier
+FROM defi d
+WHERE d.montant_palier > 5000;
+
+
+
+SELECT s.id_stream
+FROM stream s
+WHERE s.date_fin_effective IS NULL;
+
+
+
+Exercice 3 : Requêtes de jointure simples
+
+
+SELECT 
+    s.pseudo,
+    c.date_debut_autorisee,
+    c.date_fin_autorisee
+FROM Streamer s
+JOIN Creneau c ON s.id_streamer = c.id_streamer
+ORDER BY s.pseudo, c.date_debut_autorisee;
+   
+
+
+
+SELECT 
+    st.titre,
+    s.pseudo,
+    c.date_debut_autorisee,
+    c.date_fin_autorisee
+FROM Stream st
+JOIN Streamer s ON st.id_streamer = s.id_streamer
+JOIN Creneau c ON st.id_creneau = c.id_creneau
+WHERE DATE(c.date_debut_autorisee) IN ('2025-09-05', '2025-09-06')
+   OR DATE(c.date_fin_autorisee) IN ('2025-09-05', '2025-09-06')
+ORDER BY c.date_debut_autorisee;
+
+
+
+
+
+SELECT d.intitule, s.pseudo, d.montant_palier
+FROM participation_defi p
+JOIN Streamer s ON p.id_streamer = s.id_streamer
+JOIN defi d ON p.id_defi = d.id_defi
+ORDER BY s.pseudo;
+
+
+
+PHASE 2 : 
+
+Exercice 4 : 
+
+1.
+SELECT  s.pseudo, COALESCE(COUNT(st.id_stream), 0) AS sttream_count
+FROM Streamer s
+JOIN Stream st ON st.id_streamer = s.id_streamer
+GROUP BY s.pseudo
+
+2.
+SELECT 
+    d.intitule,
+    SUM(d.montant_palier) AS total_paliers_valides
+FROM defi d
+WHERE d.etat_validation = TRUE
+GROUP BY d.intitule;
+
+3. 
+SELECT
+    s.pseudo,
+    COUNT(p.id_defi) AS nombre_defis
+FROM Streamer s
+JOIN Participation_Defi p
+    ON s.id_streamer = p.id_streamer
+GROUP BY s.id_streamer, s.pseudo
+HAVING COUNT(p.id_defi) >= 2;
+
+
+4.
+SELECT
+    s.titre, 
+	EXTRACT(EPOCH FROM (s.heure_fin - s.heure_debut)) / 3600 AS duree_total,
+	AVG(EXTRACT(EPOCH FROM (s.heure_fin - s.heure_debut)) / 3600) OVER() AS duree_moyenne
+FROM Stream s
+
+
+
+5. 
+SELECT DISTINCT 
+    s.pseudo,
+	st.titre, 
+	st.heure_debut
+FROM Stream st
+INNER JOIN Streamer s ON s.id_streamer = st.id_streamer
+
+
+
+
+Exercice 5 
+
+1.
+UPDATE Defi 
+SET montant_palier = montant_palier + montant_palier * 0.10
+WHERE intitule = 'Saut en parachute en live'
+
+
+2.
+UPDATE Defi
+SET etat_validation = TRUE
+WHERE etat_validation = FALSE
+  AND id_defi IN (
+      SELECT id_defi
+      FROM Participation_Defi
+      GROUP BY id_defi
+      HAVING COUNT(id_streamer) >= 3
+  );
+
+
+3.
+SELECT *
+FROM Stream
+WHERE date_fin_effective IS NULL;
+DELETE FROM Stream
+WHERE date_fin_effective IS NULL;
+
+
+4.
+SELECT *
+FROM creneau
+WHERE date_fin_autorisee < CURRENT_DATE;
+DELETE FROM Creneau
+WHERE date_fin_autorisee < CURRENT_DATE;
+
+
+PHASE 3
+
+Exercice 6: 
+
+1.
+SELECT s.pseudo , COUNT(p.id_defi)
+FROM participation_defi p 
+JOIN Streamer s ON s.id_streamer = p.id_streamer
+GROUP BY s.id_streamer, s.pseudo;
+
+
+2.
+SELECT
+    d.intitule,
+    d.montant_palier
+FROM Defi d
+LEFT JOIN Participation_Defi pd
+    ON d.id_defi = pd.id_defi
+WHERE pd.id_defi IS NULL;
+
+
+3.
+SELECT
+    d.intitule,
+    d.montant_palier,
+	COALESCE(COUNT(p.id_streamer),0) AS nbr_participants
+FROM Defi d
+LEFT JOIN Participation_Defi p
+    ON d.id_defi = p.id_defi
+GROUP BY   d.intitule, d.montant_palier, d.id_defi
+HAVING COUNT(p.id_streamer) > 2; 
+
+
+4.
+SELECT
+    s.pseudo,
+    COUNT(pd.id_defi) AS nombre_defis,
+    SUM(d.montant_palier) AS montant_total_engage
+FROM Streamer s
+LEFT JOIN Participation_Defi pd
+    ON s.id_streamer = pd.id_streamer
+LEFT JOIN Defi d
+    ON pd.id_defi = d.id_defi
+GROUP BY s.id_streamer, s.pseudo
+ORDER BY montant_total_engage DESC;
+
+
+
+5.
+SELECT
+    s.pseudo,
+    c.date_debut_autorisee,
+    c.date_fin_autorisee,
+    COUNT(st.id_stream) AS nombre_streams
+FROM Streamer s
+JOIN Creneau c
+    ON s.id_streamer = c.id_streamer
+LEFT JOIN Stream st
+    ON s.id_streamer = st.id_streamer
+    AND c.id_creneau = st.id_creneau
+GROUP BY
+    s.id_streamer,
+    s.pseudo,
+    c.id_creneau,
+    c.date_debut_autorisee,
+    c.date_fin_autorisee
+ORDER BY s.pseudo, c.date_debut_autorisee;
+
+
+
+Exercice 7 : 
+
+Partie A :
+
+1.
+SELECT
+    st.titre,
+    s.pseudo,
+    c.date_debut_autorisee,
+    c.date_fin_autorisee,
+    st.heure_debut,
+    st.heure_fin,
+    CASE
+        WHEN st.heure_debut >= c.date_debut_autorisee
+         AND st.heure_fin <= c.date_fin_autorisee
+        THEN 'VALIDE'
+        ELSE 'INVALIDE'
+    END AS statut_validation
+FROM Stream st
+JOIN Streamer s
+    ON st.id_streamer = s.id_streamer
+JOIN Creneau c
+    ON st.id_creneau = c.id_creneau;
+
+
+2.
+SELECT
+    st.titre,
+    s.pseudo,
+    c.date_debut_autorisee,
+    c.date_fin_autorisee,
+    st.heure_debut,
+    st.heure_fin
+FROM Stream st
+JOIN Streamer s
+    ON st.id_streamer = s.id_streamer
+JOIN Creneau c
+    ON st.id_creneau = c.id_creneau
+WHERE NOT (
+    st.heure_debut >= c.date_debut_autorisee
+    AND st.heure_fin <= c.date_fin_autorisee
+);
+
+
+Partie B :
+
+3.
+SELECT
+    st.titre,
+    s.pseudo,
+    st.heure_fin AS heure_fin_prevue,
+    st.date_fin_effective,
+    CASE
+        WHEN st.date_fin_effective IS NULL THEN 'DEPASSEMENT'
+        WHEN st.date_fin_effective <= st.heure_fin THEN 'OK'
+        ELSE 'DEPASSEMENT'
+    END AS statut,
+
+    CASE
+        WHEN st.date_fin_effective > st.heure_fin
+        THEN EXTRACT(EPOCH FROM (st.date_fin_effective - st.heure_fin)) / 60
+        ELSE 0
+    END AS duree_depassement_minutes
+
+FROM Stream st
+JOIN Streamer s
+    ON st.id_streamer = s.id_streamer;
+
+
+4.
+SELECT
+    COUNT(*) AS nombre_streams_en_retard,
+    AVG(
+        EXTRACT(EPOCH FROM (st.date_fin_effective - st.heure_fin)) / 60
+    ) AS duree_moyenne_retard_minutes
+FROM Stream st
+WHERE st.date_fin_effective > st.heure_fin;
+
+
+PHASE 4 
+
+Exercice 8 :
+
+Etape 1 :
+
+TRUNCATE TABLE stream, participation_defi, creneau, defi, streamer RESTART IDENTITY CASCADE;
+
+-- 2. Insert 50,000 streamers
+DO $$
+BEGIN
+    FOR i IN 1..50000 LOOP
+        INSERT INTO streamer (pseudo, url_twitch)
+        VALUES ('pseudo_' || i, 'https://twitch.tv/pseudo_' || i);
+    END LOOP;
+END $$;
+
+-- 3. Insert 50,000 défis
+DO $$
+BEGIN
+    FOR i IN 1..50000 LOOP
+        INSERT INTO defi (intitule, montant_palier, etat_validation)
+        VALUES (
+            'defi_' || i,
+            (random() * 50000)::DECIMAL(12,2) + 500,
+            (random() < 0.5)
+        );
+    END LOOP;
+END $$;
+
+-- 4. Insert 250,000 participations (M:N)
+-- Correction : Utilisation de FLOOR et gestion des conflits de clés primaires
+DO $$
+BEGIN
+    FOR i IN 1..250000 LOOP
+        INSERT INTO participation_defi (id_streamer, id_defi)
+        VALUES (
+            FLOOR(random() * 50000 + 1)::INT,
+            FLOOR(random() * 50000 + 1)::INT
+        )
+        ON CONFLICT DO NOTHING; -- Évite l'erreur si le couple existe déjà
+    END LOOP;
+END $$;
+
+-- 5. Insert 100,000 créneaux
+DO $$
+DECLARE
+    start_date TIMESTAMP;
+    end_date TIMESTAMP;
+BEGIN
+    FOR i IN 1..100000 LOOP
+        start_date := TIMESTAMP '2025-09-05 18:00:00' + (random() * 48)::INT * INTERVAL '1 hour';
+        end_date := start_date + (random() * 4 + 1)::INT * INTERVAL '1 hour';
+        INSERT INTO creneau (id_streamer, date_debut_autorisee, date_fin_autorisee)
+        VALUES (
+            FLOOR(random() * 50000 + 1)::INT,
+            start_date,
+            end_date
+        );
+    END LOOP;
+END $$;
+
+-- 6. Insert 100,000 streams
+DO $$
+DECLARE
+    start_date TIMESTAMP;
+    end_date TIMESTAMP;
+    effective_end_date TIMESTAMP;
+BEGIN
+    FOR i IN 1..100000 LOOP
+        start_date := TIMESTAMP '2025-09-05 18:00:00' + (random() * 48)::INT * INTERVAL '1 hour';
+        end_date := start_date + (random() * 4 + 1)::INT * INTERVAL '1 hour';
+        effective_end_date := CASE WHEN random() < 0.7 
+                              THEN end_date 
+                              ELSE end_date + (random() * 3)::INT * INTERVAL '1 hour'
+                              END;
+        INSERT INTO stream (id_streamer, id_creneau, titre, heure_debut, heure_fin, date_fin_effective)
+        VALUES (
+            FLOOR(random() * 50000 + 1)::INT,
+            FLOOR(random() * 100000 + 1)::INT,
+            'Stream caritatif ' || i,
+            start_date,
+            end_date,
+            effective_end_date
+        );
+    END LOOP;
+END $$;
+
+
+ETAPE 2 : 
+
+EXPLAIN ANALYZE
+SELECT 
+    s.pseudo,
+    d.intitule,
+    COUNT(st.id_stream) as nb_streams,
+    COUNT(CASE WHEN st.date_fin_effective > st.heure_fin THEN 1 END) as nb_depassements
+FROM streamer s
+JOIN participation_defi pd ON s.id_streamer = pd.id_streamer
+JOIN defi d ON pd.id_defi = d.id_defi
+LEFT JOIN stream st ON s.id_streamer = st.id_streamer
+-- MODIFICATION : On applique une fonction sur la colonne indexée
+-- Cela empêche l'utilisation de l'index B-Tree classique
+WHERE (s.id_streamer + 0) < 5000 
+GROUP BY s.id_streamer, s.pseudo, d.id_defi, d.intitule
+ORDER BY s.pseudo, d.intitule;
+
+
+ETAPE 3 : 
+
+1. temps d'execution : 
+		Planning Time : 0.972 ms
+		Execution Time : 243.667 ms
+
+2. Seq Scans :
+		Seq Scan on participation_defi pd  (cost=0.00..3606.89 rows=249989 width=8) (actual time=0.008..14.268 rows=249989 loops=1)
+	  	Seq Scan on stream st  (cost=0.00..2137.00 rows=100000 width=24) (actual time=0.007..6.242 rows=100000 loops=1)
+	  	Seq Scan on streamer s  (cost=0.00..1218.00 rows=16667 width=16) (actual time=0.008..3.621 rows=4999 loops=1)
+	  	Seq Scan on defi d  (cost=0.00..851.00 rows=50000 width=14) (actual time=0.013..5.094 rows=50000 loops=1)
+
+3. Les operations lourdes : 
+		Seq Scan on participation_defi pd  (.... rows=249989 loops=1)
+		Seq Scan on stream st  (.... rows=100000 loops=1)
+		Seq Scan on defi d  (.... rows=50000 loops=1)
+		Hash Join  (.... rows=52991 loops=1)
+		HashAggregate  (.... rows=24735 loops=1)
+
+4. la requête présente des performances élevées car elle repose sur des lectures complètes des tables (Seq Scan), 
+ce qui oblige la base de données à parcourir l’ensemble des lignes sans utiliser d’index. 
+Les jointures entre les différentes tables génèrent un volume important de données intermédiaires, et les opérations de regroupement et de tri augmentent encore le coût de traitement. 
+Ainsi, plusieurs centaines de milliers de lignes sont manipulées, ce qui entraîne un temps d’exécution élevé et une charge importante sur le système
+
+
+
+
+
+
+ETAPE 5 :
+-- Index sur les clés étrangères impliquées dans les jointures
+CREATE INDEX idx_participation_defi_id_streamer 
+    ON participation_defi(id_streamer);
+CREATE INDEX idx_participation_defi_id_defi 
+    ON participation_defi(id_defi);
+
+-- Index sur les jointures de stream
+CREATE INDEX idx_stream_id_streamer 
+    ON stream(id_streamer);
+
+-- Index sur les comparaisons et filtres
+CREATE INDEX idx_stream_date_fin_effective 
+    ON stream(date_fin_effective);
+
+-- Index composé pour les filtres combinés
+CREATE INDEX idx_stream_id_streamer_date_fin_effective 
+    ON stream(id_streamer, date_fin_effective);
+
+
+
+
+ETAPE 6 : 
+
+1. temps d'execution :
+		Planning Time : 1.231 ms
+		Execution Time : 172.644 ms
+
+2. Seq Scans :
+		Parallel Seq Scan on participation_defi pd  (cost=0.00..2577.52 rows=147052 width=8) (actual time=0.006..8.231 rows=124994 loops=2)
+		Seq Scan on streamer s  (cost=0.00..1218.00 rows=16667 width=16) (actual time=0.040..4.438 rows=4999 loops=2)
+		Seq Scan on defi d  (cost=0.00..851.00 rows=50000 width=14) (actual time=0.032..5.830 rows=50000 loops=2)
+		Index Scan using idx_stream_id_streamer on stream st  (cost=0.29..6876.28 rows=100000 width=24) (actual time=0.058..7.858 rows=10019 loops=1)
+
+3. Nombre de lignes traités :
+		Parallel Seq Scan → 124994 rows × 2 loops ≈ 249 988 lignes
+		Seq Scan → 50000 rows × 2 loops ≈ 100 000 lignes
+		Seq Scan → 4999 rows × 2 loops ≈ 9 998 lignes lues (mais 50 000 filtrées au total)
+		Index Scan → 10019 rows
+		Materialize → 49808 rows
+		Index Scan → 10019 rows
+		Materialize → 49808 rows
+	Environ 450000 lignes brute
+
+4. Le gain en performance : 
+		Gain (%) = (Ancien temps - Nouveau temps) / Ancien temps × 100
+			   = (243.667 - 172.644) / 243.667 × 100
+			   = 71.023 / 243.667 × 100
+			   ≈ 29.14 %
+
+
+
+
+ETAPE 7 : 
+
+EXPLAIN ANALYZE
+SELECT s.pseudo, COUNT(pd.id_defi) as nb_defis
+FROM streamer s
+LEFT JOIN participation_defi pd ON s.id_streamer = pd.id_streamer
+WHERE s.pseudo LIKE '%pseudo%1%'
+GROUP BY s.id_streamer, s.pseudo;
+
+
+
+
+
+
+
+
+
+
+
+
+
